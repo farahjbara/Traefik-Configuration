@@ -1,0 +1,42 @@
+version: '3.4'
+services:
+
+  traefik:
+    image: traefik:1.7.2-alpine
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+           - node.hostname == vps424275
+      labels:
+        - "traefik.enable=true"
+        - "traefik.port=8080"
+        - "traefik.docker.network=traefik-net"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro  
+      - /home/ubuntu/traefik2/traefik.toml:/traefik.toml:ro
+      - /home/ubuntu/traefik2/log/access.log:/var/log/access.log:rw
+      # - /home/ubuntu/traefik/log/traefik.log:/var/log/traefik.log:rw
+      - /home/ubuntu/traefik2/acme.json:/acme.json:rw
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+    networks:
+      - traefik-net
+    command:
+      - "--web"
+      # - "--traefikLog.filePath=/var/log/traefik.log"
+      # - "--traefikLog.format=common"
+      - "--accessLog.filePath=/var/log/access.log"
+      - "--accessLog.format=json"
+
+networks:
+  traefik-net:
+    external: true
