@@ -1,0 +1,100 @@
+logLevel = "ERROR"
+
+defaultEntryPoints = ["http", "https"]
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+  compress = true
+    [entryPoints.http.redirect]
+    regex = "^http://(.*)"
+    replacement = "https://$1"
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+      [entryPoints.https.tls]
+
+[forwardingTimeouts]
+dialTimeout = "30000s"
+responseHeaderTimeout = "30000s"
+
+[respondingTimeouts]
+readTimeout = "30000s"
+writeTimeout = "30000s"
+idleTimeout = "30000s"
+
+
+#[api]
+#entrypoint="dashboard"
+
+#[retry]
+
+# [traefikLog]
+#   filePath = "/var/log/traefik.log"
+#   format = "common"
+[accessLog]
+  filePath = "/var/log/access.log"
+  format = "json"
+  [accessLog.fields]
+    defaultMode = "drop"
+    [accessLog.fields.names]
+      "StartUTC" = "keep"
+      "StartLocal" = "drop"
+      "Duration" = "drop"
+      "FrontendName" = "drop"
+      "BackendName" = "drop"
+      "BackendURL" = "drop"
+      "BackendAddr" = "drop"
+      "ClientAddr" = "drop"
+      "ClientHost" = "keep"
+      "ClientPort" = "drop"
+      "ClientUsername" = "drop"
+      "RequestAddr" = "drop"
+      "RequestHost" = "keep"
+      "RequestPort" = "drop"
+      "RequestMethod" = "drop"
+      "RequestPath" = "keep"
+      "RequestProtocol" = "drop"
+      "RequestLine" = "drop"
+      "RequestContentSize" = "drop"
+      "OriginDuration" = "drop"
+      "OriginContentSize" = "drop"
+      "OriginStatus" = "drop"
+      "OriginStatusLine" = "drop"
+      "DownstreamStatus" = "drop"
+      "DownstreamStatusLine" = "drop"
+      "DownstreamContentSize" = "drop"
+      "RequestCount" = "drop"
+      "GzipRatio" = "drop"
+      "Overhead" = "drop"
+      "RetryAttempts" = "drop"
+    [accessLog.fields.headers]
+      defaultMode = "drop"
+      [accessLog.fields.headers.names]
+        "User-Agent" = "keep"
+        "Authorization" = "drop"
+        "Content-Type" = "drop"
+
+[acme]
+email = "hamza.hajji221@gmail.com"
+# caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+caServer = "https://acme-v02.api.letsencrypt.org/directory"
+storage = "acme.json"
+entryPoint = "https"
+onHostRule = true
+  [acme.httpChallenge]
+  entryPoint = "http"
+
+[[acme.domains]]
+  main = "adopti-api-dev.latech.io"
+[[acme.domains]]
+  main = "adopti-dev.latech.io"
+[[acme.domains]]
+  main = "adopti-api-test2.latech.io"
+[[acme.domains]]
+  main = "adopti-front-test.latech.io"
+
+[docker]
+domain = "latech.io"
+watch = true
+swarmMode = true
+network = "traefik-net"
